@@ -2,7 +2,7 @@ import axios from 'axios';
 import {generateNumscript} from "formance-numscript-generator/src/index.js";
 import {fakerPT_BR as faker} from "@faker-js/faker";
 import {NumscriptTransaction} from "formance-numscript-generator/src/types.js";
-import fs from "fs/promises";
+import fs from "fs";
 import path from "path";
 import {fileURLToPath} from "node:url";
 
@@ -17,7 +17,9 @@ const previous_tran = Number(args[3]);
 const directory = path.join(__dirname, ledger_version, type)
 const filePath = path.join(directory, `results_${accounts}_${previous_tran}.csv`)
 
-// fs.mkdir(directory);
+if (!fs.existsSync(directory)) {
+  await fs.promises.mkdir(directory);
+}
 
 const api = axios.create(
     {
@@ -97,7 +99,7 @@ async function createTransaction(account_number, transaction) {
     const startTime = performance.now();
     await api.post(`/transactions`, transaction)
     const endTime = performance.now();
-    await fs.appendFile(filePath, `${account_number},${endTime - startTime}\n`)
+    await fs.promises.appendFile(filePath, `${account_number},${endTime - startTime}\n`)
 }
 
 async function runConcurrentJobs(transactions) {
