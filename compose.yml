@@ -12,7 +12,7 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5434:5432"
     environment:
       POSTGRES_USER: ledger
       POSTGRES_PASSWORD: ledger
@@ -22,7 +22,7 @@ services:
       - ledger-test
 
   ledger:
-    image: "ghcr.io/formancehq/ledger:latest"
+    image: "ghcr.io/formancehq/ledger:${LEDGER_VERSION}"
     healthcheck:
       test: [ "CMD", "wget", "http://127.0.0.1:3068/_info", "-O", "-", "-q" ]
       interval: 10s
@@ -37,3 +37,5 @@ services:
       POSTGRES_URI: "postgresql://ledger:ledger@postgres/ledger?sslmode=disable"
     networks:
       - ledger-test
+    env_file:
+      - .env
